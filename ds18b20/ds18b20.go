@@ -2,23 +2,29 @@ package ds18b20
 
 import (
 	"errors"
-
-	"github.com/dn-kolesnikov/tinygo-drivers/onewire"
 )
 
 // Device ROM commands
 const (
 	DS18B20_CONVERT_TEMPERATURE uint8 = 0x44
 	DS18B20_READ_SCRATCHPAD     uint8 = 0xBE
-	DS18B20_COPY_SCRATCHPAD     uint8 = 0x48
 	DS18B20_WRITE_SCRATCHPAD    uint8 = 0x4E
-	DS18B20_READ_POWER_SUPPLY   uint8 = 0xB4
-	DS18B20_RECALL_E2           uint8 = 0xB8
+	// DS18B20_COPY_SCRATCHPAD     uint8 = 0x48
+	// DS18B20_READ_POWER_SUPPLY   uint8 = 0xB4
+	// DS18B20_RECALL_E2           uint8 = 0xB8
 )
+
+//
+type OWDevice interface {
+	Write(uint8)
+	Read() uint8
+	Select([]uint8) error
+	Сrc8([]uint8, int) uint8
+}
 
 // Device wraps a connection to an 1-Wire devices.
 type Device struct {
-	owd onewire.Device
+	owd OWDevice
 }
 
 // Errors list
@@ -27,7 +33,7 @@ var (
 )
 
 //
-func New(owd onewire.Device) Device {
+func New(owd OWDevice) Device {
 	return Device{
 		owd: owd,
 	}
@@ -58,13 +64,13 @@ func (d Device) RequestTemperature(romid []uint8) {
 // byte 0: Temperature LSB
 // byte 1: Temperature MSB
 func (d Device) ReadTemperatureRaw(romid []uint8) ([]uint8, error) {
-	var spb = make([]uint8, 9) // ScratchPad buffer
+	spb := make([]uint8, 9) // ScratchPad buffer
 	d.owd.Select(romid)
 	d.owd.Write(DS18B20_READ_SCRATCHPAD)
 	for i := 0; i < 9; i++ {
 		spb[i] = d.owd.Read()
 	}
-	if onewire.Сrc8(spb, 8) != spb[8] {
+	if d.owd.Сrc8(spb, 8) != spb[8] {
 		return []uint8{}, errReadTemperature
 	}
 	return spb[:2], nil
