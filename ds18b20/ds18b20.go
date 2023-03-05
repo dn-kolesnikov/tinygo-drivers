@@ -71,9 +71,9 @@ func (d Device) ReadTemperatureRaw(romid []uint8) ([]uint8, error) {
 		spb[i] = d.owd.Read()
 	}
 	if d.owd.Сrc8(spb, 8) != spb[8] {
-		return []uint8{}, errReadTemperature
+		return spb[:0:0], errReadTemperature
 	}
-	return spb[:2], nil
+	return spb[:2:2], nil
 }
 
 // ReadTemperature returns the temperature in celsius milli degrees (°C/1000)
