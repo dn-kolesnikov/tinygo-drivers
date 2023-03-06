@@ -132,19 +132,25 @@ func (d Device) Select(romid []uint8) error {
 }
 
 // Search searches for all devices on the bus.
+// Note: max 32 slave devices per bus
 func (d Device) Search(cmd uint8) ([][]uint8, error) {
 	var (
-		bit, bit_c  uint8
-		bitOffset   uint8
-		lastZero    uint8
-		lastFork    uint8
-		lastAddress = make([]uint8, 8)
-		romIDs      = make([][]uint8, 0, 32)
+		bit, bit_c  uint8 = 0, 0
+		bitOffset   uint8 = 0
+		lastZero    uint8 = 0
+		lastFork    uint8 = 0
+		lastAddress       = make([]uint8, 8)
+		romIDs            = make([][]uint8, 32) //
+		romIndex    uint8 = 0
 	)
+
+	for i := range romIDs {
+		romIDs[i] = make([]uint8, 8)
+	}
 
 	for ok := true; ok; ok = (lastFork != 0) {
 		if err := d.Reset(); err != nil {
-			return romIDs, err
+			return romIDs[:0:0], err
 		}
 
 		// send search command to bus
@@ -180,9 +186,10 @@ func (d Device) Search(cmd uint8) ([][]uint8, error) {
 			d.WriteBit(bit)
 		}
 		lastFork = lastZero
-		romIDs = append(romIDs, lastAddress)
+		copy(romIDs[romIndex], lastAddress)
+		romIndex++
 	}
-	return romIDs, nil
+	return romIDs[:romIndex:romIndex], nil
 }
 
 // Crc8 compute a Dallas Semiconductor 8 bit CRC.
