@@ -9,17 +9,9 @@ import (
 )
 
 func main() {
-	// Define pin for 1-wire devices
-	// the pin must be pulled up to the VCC via a resistor (default 4.7k).
-
-	// for bluepill
-	// pin := machine.PA0
 
 	//for RP2040 pico
 	pin := machine.GP16
-
-	// for arduino
-	// pin := machine.PB2
 
 	ow := onewire.New(pin)
 
