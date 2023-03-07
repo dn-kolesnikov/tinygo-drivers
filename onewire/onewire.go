@@ -103,7 +103,7 @@ func (d Device) Read() (data uint8) {
 func (d Device) ReadAddress() ([]uint8, error) {
 	var romid = make([]uint8, 8)
 	if err := d.Reset(); err != nil {
-		return romid, err
+		return nil, err
 	}
 	d.Write(ONEWIRE_READ_ROM)
 	for i := 0; i < 8; i++ {
@@ -150,7 +150,7 @@ func (d Device) Search(cmd uint8) ([][]uint8, error) {
 
 	for ok := true; ok; ok = (lastFork != 0) {
 		if err := d.Reset(); err != nil {
-			return romIDs[:0:0], err
+			return nil, err
 		}
 
 		// send search command to bus
@@ -163,7 +163,7 @@ func (d Device) Search(cmd uint8) ([][]uint8, error) {
 			bit_c = d.ReadBit() // read second (complementary) address bit
 
 			if bit == 1 && bit_c == 1 { // no device
-				return romIDs, errNoPresence
+				return nil, errNoPresence
 			}
 
 			if bit == 0 && bit_c == 0 { // collision

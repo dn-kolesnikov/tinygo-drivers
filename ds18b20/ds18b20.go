@@ -71,7 +71,7 @@ func (d Device) ReadTemperatureRaw(romid []uint8) ([]uint8, error) {
 		spb[i] = d.owd.Read()
 	}
 	if d.owd.Сrc8(spb, 8) != spb[8] {
-		return spb[:0:0], errReadTemperature
+		return nil, errReadTemperature
 	}
 	return spb[:2:2], nil
 }
