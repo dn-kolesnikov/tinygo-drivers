@@ -110,7 +110,7 @@ func (d Device) ReadAddress() ([]uint8, error) {
 		romid[i] = d.Read()
 	}
 	if d.Сrc8(romid, 7) != romid[7] {
-		return romid, errReadAddress
+		return nil, errReadAddress
 	}
 	return romid, nil
 }
