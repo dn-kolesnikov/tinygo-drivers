@@ -6,12 +6,12 @@ import (
 
 // Device ROM commands
 const (
-	DS18B20_CONVERT_TEMPERATURE uint8 = 0x44
-	DS18B20_READ_SCRATCHPAD     uint8 = 0xBE
-	DS18B20_WRITE_SCRATCHPAD    uint8 = 0x4E
-	// DS18B20_COPY_SCRATCHPAD     uint8 = 0x48
-	// DS18B20_READ_POWER_SUPPLY   uint8 = 0xB4
-	// DS18B20_RECALL_E2           uint8 = 0xB8
+	CONVERT_TEMPERATURE_COMMAND uint8 = 0x44
+	READ_SCRATCHPAD_COMMAND     uint8 = 0xBE
+	WRITE_SCRATCHPAD_COMMAND    uint8 = 0x4E
+	// COPY_SCRATCHPAD_COMMAND     uint8 = 0x48
+	// READ_POWER_SUPPLY_COMMAND   uint8 = 0xB4
+	// RECALL_E2_COMMAND          uint8 = 0xB8
 )
 
 //
@@ -46,7 +46,7 @@ func (d Device) Configure() {}
 func (d Device) ThermometerResolution(romid []uint8, resolution uint8) {
 	if 9 <= resolution && resolution <= 12 {
 		d.owd.Select(romid)
-		d.owd.Write(DS18B20_WRITE_SCRATCHPAD)       // send three data bytes to scratchpad (TH, TL, and config)
+		d.owd.Write(WRITE_SCRATCHPAD_COMMAND)       // send three data bytes to scratchpad (TH, TL, and config)
 		d.owd.Write(0xFF)                           // to TH
 		d.owd.Write(0x00)                           // to TL
 		d.owd.Write(((resolution - 9) << 5) | 0x1F) // to resolution config
@@ -56,7 +56,7 @@ func (d Device) ThermometerResolution(romid []uint8, resolution uint8) {
 // RequestTemperature sends request to device
 func (d Device) RequestTemperature(romid []uint8) {
 	d.owd.Select(romid)
-	d.owd.Write(DS18B20_CONVERT_TEMPERATURE)
+	d.owd.Write(CONVERT_TEMPERATURE_COMMAND)
 }
 
 // ReadTemperatureRaw returns the raw temperature.
@@ -66,7 +66,7 @@ func (d Device) RequestTemperature(romid []uint8) {
 func (d Device) ReadTemperatureRaw(romid []uint8) ([]uint8, error) {
 	spb := make([]uint8, 9) // ScratchPad buffer
 	d.owd.Select(romid)
-	d.owd.Write(DS18B20_READ_SCRATCHPAD)
+	d.owd.Write(READ_SCRATCHPAD_COMMAND)
 	for i := 0; i < 9; i++ {
 		spb[i] = d.owd.Read()
 	}
