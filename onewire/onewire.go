@@ -9,10 +9,10 @@ import (
 
 // OneWire ROM commands
 const (
-	ONEWIRE_READ_ROM   uint8 = 0x33
-	ONEWIRE_MATCH_ROM  uint8 = 0x55
-	ONEWIRE_SKIP_ROM   uint8 = 0xCC
-	ONEWIRE_SEARCH_ROM uint8 = 0xF0
+	READ_ROM_COMMAND   uint8 = 0x33
+	MATCH_ROM_COMMAND  uint8 = 0x55
+	SKIP_ROM_COMMAND   uint8 = 0xCC
+	SEARCH_ROM_COMMAND uint8 = 0xF0
 )
 
 // Device wraps a connection to an 1-Wire devices.
@@ -105,7 +105,7 @@ func (d Device) ReadAddress() ([]uint8, error) {
 	if err := d.Reset(); err != nil {
 		return nil, err
 	}
-	d.Write(ONEWIRE_READ_ROM)
+	d.Write(READ_ROM_COMMAND)
 	for i := 0; i < 8; i++ {
 		romid[i] = d.Read()
 	}
@@ -121,10 +121,10 @@ func (d Device) Select(romid []uint8) error {
 		return err
 	}
 	if len(romid) == 0 {
-		d.Write(ONEWIRE_SKIP_ROM)
+		d.Write(SKIP_ROM_COMMAND)
 		return nil
 	}
-	d.Write(ONEWIRE_MATCH_ROM)
+	d.Write(MATCH_ROM_COMMAND)
 	for i := 0; i < 8; i++ {
 		d.Write(romid[i])
 	}

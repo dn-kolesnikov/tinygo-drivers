@@ -21,7 +21,7 @@ func main() {
 		println()
 		println("Device:", machine.Device)
 
-		romIDs, err := ow.Search(onewire.ONEWIRE_SEARCH_ROM)
+		romIDs, err := ow.Search(onewire.SEARCH_ROM_COMMAND)
 		if err != nil {
 			println(err)
 		}

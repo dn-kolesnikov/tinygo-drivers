@@ -16,7 +16,7 @@ func main() {
 	pin := machine.GP16
 
 	ow := onewire.New(pin)
-	romIDs, err := ow.Search(onewire.ONEWIRE_SEARCH_ROM)
+	romIDs, err := ow.Search(onewire.SEARCH_ROM_COMMAND)
 	if err != nil {
 		println(err)
 	}
